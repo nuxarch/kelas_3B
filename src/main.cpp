@@ -1,18 +1,30 @@
 #include <Arduino.h>
+#include <AVR_PWM.h>
 
-#define PIN_SENSOR_VBATERAI  A0
+#define PIN_SENSOR_VBATERAI  A1
 #define R1 4500.0
 #define R2 500.0
 
+#define pinToUse     5
 
 
 uint16_t data_adc_10bit=0;
 float tegangan_baterai=0;
 uint16_t datake=1;
 
+// reates pwm instance
+AVR_PWM* PWM_Instance;
+
+float frequency;
+float dutyCycle;
+
 void setup() {
   Serial.begin(115200);
   Serial.println("Program membaca tegangan baterai");
+
+  frequency = 300;    //20000;
+  //assigns PWM frequency of 20 KHz and a duty cycle of 0%
+  PWM_Instance = new AVR_PWM(pinToUse, frequency, 0);
 }
 
 void loop() {
@@ -30,5 +42,13 @@ void loop() {
   // monitoring via serial ploter
   Serial.println(">teg:"+String(tegangan_baterai,2));
 
-  delay(50);
+  dutyCycle = tegangan_baterai;
+  Serial.println(">duty:"+String(dutyCycle,2));
+  PWM_Instance->setPWM(pinToUse, frequency, dutyCycle);
+  delay(100);
+
+  // dutyCycle = 90;
+  // Serial.println(">duty:"+String(dutyCycle,2));
+  // PWM_Instance->setPWM(pinToUse, frequency, dutyCycle);
+  // delay(1000);
 }
